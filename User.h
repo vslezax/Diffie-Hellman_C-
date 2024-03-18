@@ -26,6 +26,7 @@ private:
     BIGNUM* p;
     BIGNUM* A;
     BIGNUM* K;
+    BIGNUM* B;
     BN_CTX* ctx;
     std::string name;
     int SIZE;
@@ -37,6 +38,7 @@ public:
         p = BN_new();
         A = BN_new();
         K = BN_new();
+        B = BN_new();
         ctx = BN_CTX_new();
         this->name = name;
     }
@@ -65,8 +67,22 @@ public:
         }
         return true;
     }
-    bool calculate_K(){
+    bool calculate_B(){
+        if (BN_mod_exp(B, g, a, p, ctx) == 0){
+            std::cout << "BN_mod_exp(B) error." << std::endl;
+            return false;
+        }
+        return true;
+    }
+    bool calculate_K_by_A(){
         if (BN_mod_exp(K, A, a, p, ctx) == 0){
+            std::cout << "BN_mod_exp(K) error." << std::endl;
+            return false;
+        }
+        return true;
+    }
+    bool calculate_K_by_B(){
+        if (BN_mod_exp(K, B, a, p, ctx) == 0){
             std::cout << "BN_mod_exp(K) error." << std::endl;
             return false;
         }
@@ -83,6 +99,26 @@ public:
         }
         return true;
     }
+    bool set_A(BIGNUM* A_copy){
+        try{
+            BN_copy(A, A_copy);
+        }
+        catch (std::exception& e){
+            std::cout << name + "'s func set_A thrown exception:\n" << e.what() << std::endl;
+            return false;
+        }
+        return true;
+    }
+    bool set_B(BIGNUM* B_copy){
+        try{
+            BN_copy(B, B_copy);
+        }
+        catch (std::exception& e){
+            std::cout << name + "'s func set_B thrown exception:\n" << e.what() << std::endl;
+            return false;
+        }
+        return true;
+    }
     void print_p(){
         printBignum(p, name + "'s p:");
     }
@@ -94,6 +130,9 @@ public:
     }
     void print_A(){
         printBignum(A, name + "'s A:");
+    }
+    void print_B(){
+        printBignum(B, name + "'s B:");
     }
     void print_K(){
         printBignum(K, name + "'s K:");
@@ -110,36 +149,25 @@ public:
     BIGNUM* get_A(){
         return A;
     }
+    BIGNUM* get_B(){
+        return B;
+    }
     BIGNUM* get_K(){
         return K;
     }
     ~User(){
-        std::cout << name + "'s object start for deleting..." << std::endl;
-        if (p != nullptr){
-            BN_clear(p);
-            std::cout << name + "'s p cleared." << std::endl;
-        }
-        if (g != nullptr){
-            BN_clear(g);
-            std::cout << name + "'s g cleared." << std::endl;
-        }
-        if (a != nullptr){
-            BN_clear(a);
-            std::cout << name + "'s a cleared." << std::endl;
-        }
-        if (A != nullptr){
-            BN_clear(A);
-            std::cout << name + "'s A cleared." << std::endl;
-        }
-        if (K != nullptr){
-            BN_clear(K);
-            std::cout << name + "'s K cleared." << std::endl;
-        }
-        if (ctx != nullptr){
-            BN_CTX_free(ctx);
-            std::cout << name + "'s ctx cleared." << std::endl;
-        }
+        BN_clear(p);
+        BN_clear(g);
+        BN_clear(a);
+        BN_clear(A);
+        BN_clear(K);
+        BN_CTX_free(ctx);
+        BN_free(B);
         std::cout << name + "'s object deleted.\n" << std::endl;
+        name.clear();
+    }
+    std::string get_name(){
+        return name;
     }
 };
 
