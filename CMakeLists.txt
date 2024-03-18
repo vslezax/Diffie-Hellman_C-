@@ -7,6 +7,7 @@ find_package(OpenSSL REQUIRED)
 
 include_directories(${OPENSSL_INCLUDE_DIR})
 
-add_executable(Diffie_Hellman main.cpp)
+add_executable(Diffie_Hellman main.cpp
+        User.h)
 
 target_link_libraries(Diffie_Hellman ${OPENSSL_LIBRARIES})
